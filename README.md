@@ -5,6 +5,10 @@ Android BluetoothLeGatt Sample
 This sample demonstrates how to use the Bluetooth LE Generic Attribute Profile (GATT)
 to transmit arbitrary data between devices.
 
+Original source: https://github.com/android/connectivity
+
+Note: this code runs on actual Android devices (tested up to SDK 32 = Android 12) with Gradle 7.4.0.
+
 Introduction
 ------------
 
