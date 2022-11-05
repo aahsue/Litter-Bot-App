@@ -7,6 +7,8 @@ to transmit arbitrary data between devices.
 
 Original source: https://github.com/android/connectivity
 
+Bluetoioth LE Gatt example: https://github.com/android/connectivity-samples/tree/main/BluetoothLeGatt
+
 Note: this code runs on actual Android devices (tested up to SDK 32 = Android 12) with Gradle 7.4.0.
 
 Introduction
