@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * For a given BLE device, this Activity provides the user interface to connect, display data,
@@ -175,13 +176,6 @@ public class DeviceControlActivity extends Activity {
         mDataField.setText(R.string.no_data);
     }
 
-    // private variables for triggering continuous event for buttons
-    private Handler repeatUpdateHandler = new Handler();
-    private boolean forward = false;
-    private boolean left = false;
-    private boolean right = false;
-    private boolean backwards = false;
-    private final long REPEAT_DELAY = 50;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -200,61 +194,16 @@ public class DeviceControlActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
-
-        // uses handler object to create new thread
-        class RepetitiveUpdater implements Runnable
-        {
-            @Override
-            public void run()
-            {
-                if (forward)
-                {
-                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 0);
-                    repeatUpdateHandler.postDelayed(new RepetitiveUpdater(), REPEAT_DELAY);
-                }
-                else if (left)
-                {
-                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 1);
-                    repeatUpdateHandler.postDelayed(new RepetitiveUpdater(), REPEAT_DELAY);
-                }
-                else if (right)
-                {
-                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 2);
-                    repeatUpdateHandler.postDelayed(new RepetitiveUpdater(), REPEAT_DELAY);
-                }
-                else if (backwards)
-                {
-                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 3);
-                    repeatUpdateHandler.postDelayed(new RepetitiveUpdater(), REPEAT_DELAY);
-                }
-            }
-        }
-
         /** forward button listeners **/
         Button button_forward = (Button) findViewById(R.id.button_forward);
-        button_forward.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("wahhhhh");
-                writeGattService(mBluetoothLeService.getSupportedGattServices(), 0);
-            }
-        });
-
-        button_forward.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                System.out.println("long press forward");
-                forward = true;
-                repeatUpdateHandler.post(new RepetitiveUpdater());
-                return false;
-            }
-         });
-
         button_forward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP && forward) {
-                    forward = false;
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), -1);
+                }
+                else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 0);
                 }
                 return false;
             }
@@ -262,28 +211,14 @@ public class DeviceControlActivity extends Activity {
 
         /** left button listeners **/
         Button button_left = (Button) findViewById(R.id.button_left);
-        button_left.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                System.out.println("wahhhhh");
-                writeGattService(mBluetoothLeService.getSupportedGattServices(), 1);
-            }
-        });
-
-        button_left.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                System.out.println("long press left");
-                left = true;
-                repeatUpdateHandler.post(new RepetitiveUpdater());
-                return false;
-            }
-        });
-
         button_left.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP && left) {
-                    left = false;
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), -1);
+                }
+                else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 1);
                 }
                 return false;
             }
@@ -291,28 +226,14 @@ public class DeviceControlActivity extends Activity {
 
         /** right button listeners **/
         Button button_right = (Button) findViewById(R.id.button_right);
-        button_right.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                System.out.println("wahhhhh");
-                writeGattService(mBluetoothLeService.getSupportedGattServices(), 2);
-            }
-        });
-
-        button_right.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                System.out.println("long press right");
-                right = true;
-                repeatUpdateHandler.post(new RepetitiveUpdater());
-                return false;
-            }
-        });
-
         button_right.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP && right) {
-                    right = false;
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), -1);
+                }
+                else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 2);
                 }
                 return false;
             }
@@ -320,28 +241,14 @@ public class DeviceControlActivity extends Activity {
 
         /** backwards button listeners **/
         Button button_backwards = (Button) findViewById(R.id.button_backwards);
-        button_backwards.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                System.out.println("wahhhhh");
-                writeGattService(mBluetoothLeService.getSupportedGattServices(), 3);
-            }
-        });
-
-        button_backwards.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                System.out.println("long press backwards");
-                backwards = true;
-                repeatUpdateHandler.post(new RepetitiveUpdater());
-                return false;
-            }
-        });
-
         button_backwards.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP && backwards) {
-                    backwards = false;
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), -1);
+                }
+                else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    writeGattService(mBluetoothLeService.getSupportedGattServices(), 3);
                 }
                 return false;
             }
@@ -483,19 +390,14 @@ public class DeviceControlActivity extends Activity {
 
         // Loops through available GATT Services.
         for (BluetoothGattService gattService : gattServices) {
-            System.out.println(gattService);
             uuid = gattService.getUuid().toString();
-            System.out.println(uuid);
 
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
 
             // Loops through available Characteristics.
             for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                 uuid = gattCharacteristic.getUuid().toString();
-                System.out.println("lol");
-                System.out.println(uuid);
                 if (uuid.equals("0000ff01-0000-1000-8000-00805f9b34fb")) {
-                    System.out.println("WEEEEEWOOOOOOWEEEEEEWOOOOOO");
                     if (direction == 0)
                     {
                         gattCharacteristic.setValue("forward");
@@ -508,9 +410,13 @@ public class DeviceControlActivity extends Activity {
                     {
                         gattCharacteristic.setValue("right");
                     }
-                    else
+                    else if (direction == 3)
                     {
                         gattCharacteristic.setValue("backwards");
+                    }
+                    else if (direction == -1)
+                    {
+                        gattCharacteristic.setValue("stop");
                     }
                     DeviceControlActivity.this.mBluetoothLeService.writeCharacteristic(gattCharacteristic);
                 }
